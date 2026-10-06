@@ -1,0 +1,14 @@
+{
+  "name": "chidubem-portfolio",
+  "version": "1.0.0",
+  "description": "Personal portfolio website for Chidubem Lawrence Ezeamii",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "nodemailer": "^6.9.16"
+  }
+}
