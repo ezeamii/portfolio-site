@@ -34,6 +34,7 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
+
 const contactForm = document.getElementById("contactForm");
 const sendButton = document.getElementById("sendButton");
 const sendButtonText = document.getElementById("sendButtonText");
@@ -42,31 +43,40 @@ const formStatus = document.getElementById("formStatus");
 contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const formData = new FormData(contactForm);
-  const payload = Object.fromEntries(formData.entries());
-
   sendButton.disabled = true;
   sendButtonText.textContent = "Sending...";
   formStatus.textContent = "";
   formStatus.className = "form-status";
 
   try {
-    const response = await fetch("/api/contact", {
+    const response = await fetch(contactForm.action, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: new FormData(contactForm),
+      headers: {
+        Accept: "application/json"
+      }
     });
 
     const result = await response.json();
 
-    if (!response.ok) throw new Error(result.message || "Unable to send message.");
+    if (!response.ok) {
+      const errorMessage = result.errors
+        ? result.errors.map(error => error.message).join(" ")
+        : "Unable to send your message. Please try again.";
 
-    formStatus.textContent = result.message;
+      throw new Error(errorMessage);
+    }
+
+    formStatus.textContent =
+      "Message sent successfully! Thank you for reaching out.";
     formStatus.classList.add("success");
     contactForm.reset();
+
   } catch (error) {
-    formStatus.textContent = error.message || "Something went wrong. Please try again.";
+    formStatus.textContent =
+      error.message || "Something went wrong. Please try again.";
     formStatus.classList.add("error");
+
   } finally {
     sendButton.disabled = false;
     sendButtonText.textContent = "Send message";
